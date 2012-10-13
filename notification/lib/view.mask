@@ -1,0 +1,8 @@
+div.ui-notify-message.ui-notify-message-style.#{type} {
+	div#basic-template {
+		a.ui-notify-cross.ui-notify-close href='#' > 'x'
+		h1 > '#{title}'
+		div.ui-notify-icon;
+		p > '#{message}'
+	}
+}
