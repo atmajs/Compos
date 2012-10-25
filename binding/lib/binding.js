@@ -21,9 +21,13 @@ function() {
         Extends: mask.ValueUtils.out,
         refresh: function(values, container, x) {
             if (this.attr.attr) {
-                container[this.attr.attr] = x;
+                container.setAttribute(this.attr.attr, x);
                 return;
             }
+			if (this.attr.prop){
+				container[this.attr.attr] = x;
+                return;
+			}
             container.innerHTML = x;
         },
         render: function(values, container, cntx) {
@@ -48,12 +52,31 @@ function() {
                 if (template[0] == '#') template = document.querySelector(this.attr.template).innerHTML;
                 this.nodes = mask.compile(template);
             }
-
+			
+			if (this.attr.ref != null){
+				this.nodes = Compo.findNode(this.parent, this.attr.ref).nodes;
+				console.log('nodes', this.nodes);
+			}
+			
             for (var i = 0, length = values.length; i < length; i++) {
                 mask.renderDom(this.nodes, values[i], container, cntx);
             }
 
             this.$ = $(container);
+        },
+        add: function(values){
+			var dom = mask.renderDom(this.nodes, values, null, this),
+				container = this.$ && this.$.get(0);
+			
+			if (!container) return;
+            if ('id' in values){
+				var item = container.querySelector('[data-id="' + values.id + '"]');
+                if (item){
+					item.parentNode.replaceChild(dom, item);
+					return;
+				}
+            }
+			container.appendChild(dom);
         }
     }));
 

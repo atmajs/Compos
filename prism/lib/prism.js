@@ -1,8 +1,35 @@
 include.js('prism.lib.js').css('prism.lib.css').done(function() {
+    
+    function IDeferred(){}    
+    IDeferred.prototype = {
+        resolve: function(){
+            this.done = function(fn){
+                fn();
+            }
+            if (this.callbacks){
+                for(var i = 0, x, length = this.callbacks.length; x = this.callbacks[i], i<length; i++){
+                    x()
+                }
+            }
+            delete this.callbacks;
+        },
+        done: function(fn){
+            (this.callbacks || (this.callbacks = [])).push(fn);
+        }
+    }
+    
+    
+    function highlight(compo){
+        Prism.highlightElement(compo.$.find('code').get(0));
+        
+        compo.resolve();
+    }
+    
     mask.registerHandler('prism', Class({
         Base: Compo,
+        Extends: IDeferred,
         Construct: function() {
-            this.attr = { language: 'javascript' };
+            this.attr = { language: 'javascript' };            
         },
         render: function(values, container, cntx) {
             this.tagName = 'pre';
@@ -20,18 +47,15 @@ include.js('prism.lib.js').css('prism.lib.css').done(function() {
             Compo.prototype.render.call(this, values, container, cntx);
 
             if (this.attr.src != null) {
+                var _this = this;
                 window.include.ajax(this.attr.src).done(function(r) {
-                    this.$.find('code').html(r.ajax[0]);
-                    this._highlight();
-                }.bind(this));
+                    _this.$.find('code').html(r.ajax[0]);                    
+                    
+                    highlight(_this);                    
+                });
             }else {
-                this._highlight();
+                highlight(this);
             }
-        },
-        _highlight: function(){
-            Prism.highlightElement(this.$.find('code').get(0));
-            var scroller = Compo.find(this, 'scroller', 'up');
-            scroller && (scroller = scroller.scroller) && scroller.refresh();
         }
     }));
 });
