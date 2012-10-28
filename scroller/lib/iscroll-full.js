@@ -571,6 +571,10 @@ iScroll.prototype = {
 			return;
 		}
 
+		e.preventDefault();
+		e.stopPropagation();
+		console.log('stop prop');
+		
 		if (duration < 300 && that.options.momentum) {
 			momentumX = newPosX ? that._momentum(newPosX - that.startX, duration, -that.x, that.scrollerW - that.wrapperW + that.x, that.options.bounce ? that.wrapperW : 0) : momentumX;
 			momentumY = newPosY ? that._momentum(newPosY - that.startY, duration, -that.y, (that.maxScrollY < 0 ? that.scrollerH - that.wrapperH + that.y - that.minScrollY : 0), that.options.bounce ? that.wrapperH : 0) : momentumY;
@@ -858,7 +862,8 @@ iScroll.prototype = {
 	},
 
 	_bind: function (type, el, bubble) {
-		(el || this.scroller).addEventListener(type, this, !!bubble);
+		
+		(el || this.scroller).addEventListener(type, this,  !!bubble);
 	},
 
 	_unbind: function (type, el, bubble) {

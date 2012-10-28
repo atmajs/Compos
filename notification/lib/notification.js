@@ -1,18 +1,13 @@
-(typeof ruqq !== 'undefined' || console.error('Ruqq is not loaded'));
-(typeof mask !== 'undefined' || console.error('MaskJS is not loaded'));
-(typeof compo !== 'undefined' || (compo = {}));
-
-
-console.log('Notif.', include.location);
-
 include.css('style.css').load('view.mask').done(function(response) {
-    
+
     if (typeof $L == 'undefined') {
         $L = function(arg) {
             return arg;
         }
     }
-    var template = response.load[0],
+
+    var w = window,
+        template = response.load[0],
         stack = [],
         $t = null,
         $container = null,
@@ -20,6 +15,16 @@ include.css('style.css').load('view.mask').done(function(response) {
         width = 350,
         $alert = null,
         $overlay;
+    
+    template = "<div class='ui-notify-message ui-notify-message-style #{type}'>\
+                    <div>\
+                        <a class='ui-notify-cross ui-notify-close' href='#'>x</a>\
+                        <h1>#{title}</h1>\
+                        <div class='ui-notify-icon'></div>\
+                        <p>#{message}</p>\
+                        </div>\
+                </div>"
+	
 
     function argumentsToHtmlMessage() {
         var message = '';
@@ -29,8 +34,7 @@ include.css('style.css').load('view.mask').done(function(response) {
 
         }
         return message;
-    }
-    w.compo.Notificaton = {
+    }(w.compo || (w.compo = {})).Notification = {
         exception: function(error) {
             var message;
             if (typeof error == 'string') message = error.replace(/\n/g, '<br\>');
@@ -48,10 +52,11 @@ include.css('style.css').load('view.mask').done(function(response) {
         },
         error: function() {
             var message = argumentsToHtmlMessage.apply(this, arguments);
-            d.error('error notification:', message);
+            console.error('error notification:', message);
             this.show(message, 'error');
         },
         success: function() {
+
             var message = argumentsToHtmlMessage.apply(this, arguments);
             this.show(message, 'success');
         },
@@ -87,7 +92,7 @@ include.css('style.css').load('view.mask').done(function(response) {
                     break;
                 }
             }
-            
+
             if (!$container) {
                 $container = $('<div class="ui-notify"></div>').appendTo($('body'));
             }
@@ -96,20 +101,25 @@ include.css('style.css').load('view.mask').done(function(response) {
             }
 
             if (!$t) {
-                $t = $(mask.renderDom(template, data, []));
+                $t = $(String.format(template,data));
             } else {
                 $t.removeClass('success error warn info').addClass(data.type);
-                $t.find('p').text(data.message);
+                $t.find('p').html(data.message);
                 $t.find('h1').text(data.title);
             }
 
-            var $div = $t.clone() //
-            .prependTo(data.type.indexOf('exception') < 0 ? $container : $exceptionContainer) //
-            .cssAnimation('top', 0, 100, null, -150);
+            var $div = $t.clone().prependTo(data.type.indexOf('exception') == -1 ? $container : $exceptionContainer); 
 
-            setTimeout($div.invoker('cssAnimation', 'right', -400, 100, $div.invoker('remove')), 5000);
+
+
+            new ruqq.animate.Model3({
+                model: '-webkit-transform | translate3d(0px, -250px, 0px) > translate3d(0px, 0px, 0px) | 200ms',
+                next: '-webkit-transform | > translate3d(300px, 0px, 0px) | 100ms linear 4s'
+            }).start($div[0], function() {
+                $div.remove()
+            });
+
 
         }
     };
 });
-

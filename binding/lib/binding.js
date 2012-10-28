@@ -54,8 +54,7 @@ function() {
             }
 			
 			if (this.attr.ref != null){
-				this.nodes = Compo.findNode(this.parent, this.attr.ref).nodes;
-				console.log('nodes', this.nodes);
+				this.nodes = Compo.findNode(this.parent, this.attr.ref).nodes;				
 			}
 			
             for (var i = 0, length = values.length; i < length; i++) {

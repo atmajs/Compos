@@ -1,0 +1,24 @@
+
+
+layout:master id='apiItem' {
+    div {
+        hr;
+        div > code > placeholder#title;
+        div.description {
+            placeholder#description;
+        }
+        div.api > ul > placeholder#attributes;
+        div.example > placeholder#example;
+    }
+}
+
+layout:view master='apiItem' id='testLayout'{
+    title > 'opa;'
+    description > 'description'
+    example {
+        "example"
+    } 
+}
+
+
+
