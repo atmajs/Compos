@@ -10,9 +10,9 @@ include
 			
 
 			this.$.scroller({
-				preset: 'time',
+				preset: this.attr.preset || 'time',
                 theme: 'android-ics',
-                display: 'inline',
+				display: 'inline',
                 mode: 'scroller',
                 timeFormat:'HH:ii',
                 timeWheels: 'HHii'

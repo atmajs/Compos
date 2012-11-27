@@ -19,4 +19,24 @@ function() {
             
         }
     }));
+    
+    
+    var dialogOverlaySingleton = null;
+    mask.registerHandler('dialogOverlay', Class({
+        Base: Compo,
+        Construct: function(){
+            return (dialogOverlaySingleton || (dialogOverlaySingleton = this));
+        },
+        render: function(){
+            
+            this.nodes = {
+                tagName: 'div',
+                attr: {
+                    class: 'dialogOverlay'
+                }
+            }
+            
+            this.render = function(){};
+        }
+    }));
 }();

@@ -49,7 +49,7 @@ include.js('prism.lib.js').css('prism.lib.css').done(function() {
             if (this.attr.src != null) {
                 var _this = this;
                 window.include.ajax(this.attr.src).done(function(r) {
-                    _this.$.find('code').html(r.ajax[0]);                    
+                    _this.$.find('code').text(r.ajax[0]);                    
                     
                     highlight(_this);                    
                 });

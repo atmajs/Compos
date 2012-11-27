@@ -4,7 +4,7 @@ include.js('js/glDatePicker.min.js').css('css/android.css').done(function() {
 		Base: Compo,
 		render: function(values, container, cntx) {
 			this.tagName = 'div';
-			Compo.prototype.render.call(this, values, container, cntx);
+			Compo.render(this, values, container, cntx);
 			
 			
 			this.$.glDatePicker({
@@ -12,15 +12,19 @@ include.js('js/glDatePicker.min.js').css('css/android.css').done(function() {
 				allowOld: false,
 				showAlways: true,
 				position: 'static',
+				selectedDate: this.date,
 				onChange: function(sender, date){
-					this.setDate(date);					
+					this.setDate(date);
+					this.$.trigger('change', date);
 				}.bind(this)
 			});
 		},
 		setDate: function(date){
 			this.date = date;
-            this.$.glDatePicker('setSelectedDate',date);
-			this.$.glDatePicker('update');			
+			if (this.$ != null){
+				this.$.glDatePicker('setSelectedDate',date);
+				this.$.glDatePicker('update');
+			}
         },
 		getDate: function(date){
 			return this.date;

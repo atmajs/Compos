@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+	<link rel='stylesheet' href='style/main.css'/>
+    
+    <script type='text/javascript' src='.reference/libjs/class/lib/class.js'></script>
+    <script type='text/javascript' src='.reference/libjs/include/lib/include.js'></script>	
+
+    <script type='text/javascript' src='include.routes.js'></script>
+    <script type='text/javascript' src='script/main.js'></script>	
+
+</head>
+<body>
+
+    <script type="mask/template" id='layout'>
+
+        table {
+
+            tr {
+                td > input type='text' {
+                        dualbind value='name' changeEvent='keyup'{
+                            validate maxLength='10' message='MaxLength - 10';
+                            validate minLength='2' message='MinLength - 2';
+                            validate match='^([\w]+)$' message='Only characters';
+                        }
+                    }
+                td > div > bind value='name';
+            }
+
+            tr {
+                td > textarea {
+                    dualbind value='paths' bindingProvider='pathsProvider';
+                }
+                td > div > bind value='paths';
+            }
+
+            tr {
+                td > datePicker {
+                        dualbind value='date' getter='getDate' setter='setDate';                
+                    }
+                td > div > bind value='date';
+            }
+
+            tr {
+                td > input type='text' {
+                        dualbind value='height' {
+                            validate match='^([\d]+)$' message='Only digits';
+                            validate check='<10' message='Min Height is 10px';
+                            validate check='>500' message='Max Height is 500px';
+                               
+                        }
+                    }
+                td > div style='background:red;'> dualbind value='height' bindingProvider='heightBinder';
+            }
+        }
+        
+        
+    </script>
+
+</body>
+</html>

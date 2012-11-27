@@ -18,8 +18,8 @@ include.js('iscroll-full.js').done(function() {
          };
          
          
-         Compo.prototype.render.call(this, values, container, cntx);
-         Compo.events.on(this, 'DOMInsert', this.DOMInsert);
+         Compo.render(this, values, container, cntx);
+         Compo.shots.on(this, 'DOMInsert', this.DOMInsert);
          
          return this;
       },
