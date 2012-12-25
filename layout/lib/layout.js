@@ -1,5 +1,4 @@
-void
-function() {
+(function() {
 
     var masters = {};
 
@@ -12,14 +11,16 @@ function() {
     mask.registerHandler('layout:view', Class({
         clone: function(node) {
 
-            if (node.content != null) return {
-                content: node.content
-            };
+            if (node.content != null) {
+				return {
+					content: node.content
+				};
+			}
 
             var outnode = {
                 tagName: node.tagName || node.compoName,
                 attr: node.attr
-            }
+            };
 
             if (node.nodes != null) {
                 outnode.nodes = [];
@@ -27,7 +28,8 @@ function() {
                 var isarray = node.nodes instanceof Array,
                     length = isarray ? node.nodes.length : 1,
                     x = null;
-                for (var i = 0; x = isarray ? node.nodes[i] : node.nodes, isarray ? i < length : i < 1; i++) {
+                for (var i = 0; isarray ? i < length : i < 1; i++) {
+					x = isarray ? node.nodes[i] : node.nodes;
                     
                     if (x.tagName == 'placeholder') {
                         var value = this.get(x.attr.id);                        
@@ -48,8 +50,11 @@ function() {
 
         },
         get: function(id) {
-            for (var i = 0, x, length = this.nodes.length; x = this.nodes[i], i < length; i++) {
-                if (x.tagName == id) return x.nodes;
+            for (var i = 0, x, length = this.nodes.length; i < length; i++) {
+				x = this.nodes[i];
+                if (x.tagName == id) {
+					return x.nodes;
+				}
             }
             return null;
         },
@@ -64,4 +69,4 @@ function() {
         }
     }));
 
-}();
+}());

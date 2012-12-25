@@ -140,7 +140,7 @@ window.include && include.css('styles.css');
 		//////}
 	}));
 
-	mask.registerHandler('validationGroup', Class({
+	mask.registerHandler('validate:group', Class({
 		Extends: CompoUtils,
 		render: function(model, container, cntx) {
 			mask.renderDom(this.nodes, model, container, cntx);

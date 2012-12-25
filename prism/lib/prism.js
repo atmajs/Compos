@@ -5,10 +5,10 @@ include.js('prism.lib.js').css('prism.lib.css').done(function() {
         resolve: function(){
             this.done = function(fn){
                 fn();
-            }
+            };
             if (this.callbacks){
-                for(var i = 0, x, length = this.callbacks.length; x = this.callbacks[i], i<length; i++){
-                    x()
+                for(var i = 0, length = this.callbacks.length; i<length; i++){
+                    this.callbacks[i]();
                 }
             }
             delete this.callbacks;
@@ -16,11 +16,11 @@ include.js('prism.lib.js').css('prism.lib.css').done(function() {
         done: function(fn){
             (this.callbacks || (this.callbacks = [])).push(fn);
         }
-    }
+    };
     
     
     function highlight(compo){
-        Prism.highlightElement(compo.$.find('code').get(0));
+        window.Prism.highlightElement(compo.$.find('code').get(0));
         
         compo.resolve();
     }
@@ -35,21 +35,21 @@ include.js('prism.lib.js').css('prism.lib.css').done(function() {
             this.tagName = 'pre';
             
             var _class = 'language-' + this.attr.language;            
-            this.attr.class = _class + ' ' + (this.attr.class || '');            
+            this.attr['class'] = _class + ' ' + (this.attr['class'] || '');            
             this.nodes = {
                 tagName: 'code',
                 attr: {
-                    class: _class
+                    'class': _class
                 },
                 nodes: this.nodes
             };
             
-            Compo.prototype.render.call(this, values, container, cntx);
+            Compo.render(this, values, container, cntx);
 
             if (this.attr.src != null) {
                 var _this = this;
-                window.include.ajax(this.attr.src).done(function(r) {
-                    _this.$.find('code').text(r.ajax[0]);                    
+                include.instance().ajax(this.attr.src + '::Data').done(function(r) {
+                    _this.$.find('code').text(r.ajax.Data);                    
                     
                     highlight(_this);                    
                 });
