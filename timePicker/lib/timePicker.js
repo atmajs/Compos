@@ -4,9 +4,9 @@ include
 
 	mask.registerHandler('timePicker', Class({
 		Base: Compo,
-		render: function(values, container, cntx) {
+		render: function(model, container, cntx) {
 			this.tagName = 'div';
-			Compo.prototype.render.call(this, values, container, cntx);
+			Compo.render(this, model, container, cntx);
 			
 
 			this.$.scroller({
@@ -17,7 +17,6 @@ include
                 timeFormat:'HH:ii',
                 timeWheels: 'HHii'
 			});
-
 		}
 	}));
 });
