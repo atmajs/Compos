@@ -1,13 +1,10 @@
  include.js({
+ 	framework: ['dom/jquery','utils'],
 	lib: 'compo',
-	framework: ['dom/jquery','utils']
-}).wait().js({
 	compo: ['binding','validation', 'datepicker']
 })
 .ready(function(){
 	
-	Compo.config.setDOMLibrary($);
-
 	window.model = {
 		name: 'Alex',
 		paths: ['path1.html','path2.html'],
