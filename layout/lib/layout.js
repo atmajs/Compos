@@ -65,7 +65,7 @@
                 return;
             }
             this.nodes = this.clone(masterLayout).nodes;
-            mask.renderDom(this.nodes, values, container, cntx);
+            mask.render(this.nodes, values, container, cntx);
         }
     }));
 
