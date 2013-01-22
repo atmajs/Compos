@@ -30,9 +30,9 @@
                     x = null;
                 for (var i = 0; isarray ? i < length : i < 1; i++) {
 					x = isarray ? node.nodes[i] : node.nodes;
-                    
+
                     if (x.tagName == 'placeholder') {
-                        var value = this.get(x.attr.id);                        
+                        var value = this.get(x.attr.id);
                         if (value != null) {
                             if (value instanceof Array) {
                                 outnode.nodes = outnode.nodes.concat(value);
@@ -42,7 +42,7 @@
                         }
                         continue;
                     }
-                    
+
                     outnode.nodes.push(this.clone(x));
                 }
             }
@@ -50,12 +50,17 @@
 
         },
         get: function(id) {
-            for (var i = 0, x, length = this.nodes.length; i < length; i++) {
-				x = this.nodes[i];
+			var isarray = this.nodes instanceof Array,
+				length = isarray ? this.nodes.length : 1,
+				i = 0,
+				x;
+            for (; i < length; i++) {
+				x = isarray ? this.nodes[i] : this.nodes;
                 if (x.tagName == id) {
 					return x.nodes;
 				}
             }
+
             return null;
         },
         render: function(values, container, cntx) {
