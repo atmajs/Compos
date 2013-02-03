@@ -1,10 +1,14 @@
 (function() {
 	mask.registerHandler('list', Class({
 		Base: Compo,
-		render: function(values, container, cntx) {
-
-			values = Object.getProperty(values, this.attr.value);
-			if (values instanceof Array === false) {
+		render: function(model, container, cntx) {
+			var property = this.attr.value;
+			
+			if (property){
+				model = Object.getProperty(model, property);
+			}
+			
+			if (model instanceof Array === false) {
 				return;
 			}
 
@@ -21,8 +25,8 @@
 				this.nodes = Compo.findCompo(mask.templates, this.attr.ref).nodes;				
 			}
 
-			for (var i = 0, length = values.length; i < length; i++) {
-				mask.renderDom(this.nodes, values[i], container, cntx);
+			for (var i = 0, length = model.length; i < length; i++) {
+				mask.render(this.nodes, model[i], container, cntx);
 			}
 
 			this.$ = $(container);
@@ -34,7 +38,7 @@
 			}
 		},
 		add: function(values) {
-			var dom = mask.renderDom(this.nodes, values, null, this),
+			var dom = mask.render(this.nodes, values, null, this),
 				container = this.$ && this.$.get(0);
 
 			
