@@ -1,77 +1,170 @@
 (function() {
 
-    var masters = {};
+	var tag_CONTENT = '@content',
+		tag_PLACEHOLDER = '@placeholder',
+		tag_layout_VIEW = 'layout:view',
+		tag_layout_MASTER = 'layout:master',
+		_masters = {};
 
-    mask.registerHandler('layout:master', Class({
-        render: function() {
-            masters[this.attr.id] = this;
-        }
-    }));
+	function Master() {}
+	Master.prototype = {
+		constructor: Master,
+		render: function() {
+			_masters[this.attr.id] = this;
+		}
+	};
 
-    mask.registerHandler('layout:view', Class({
-        clone: function(node) {
+	mask.registerHandler(tag_layout_MASTER, Master);
 
-            if (node.content != null) {
-				return {
-					content: node.content
-				};
+
+	function View() {}
+	View.prototype = {
+		constructor: View,
+		renderStart: function() {
+			var masterLayout = _masters[this.attr.master];
+
+			// if DEBUG
+			if (masterLayout == null) {
+				console.error('Master Layout is not defined for', this);
+				return;
+			}
+			// endif
+
+			if (this.contents == null) {
+				this.contents = view_getContents(this.nodes);
+
+				// if DEBUG
+				Object.keys && Object.keys(this.contents).length === 0 && console.warn('no contents: @content #someID');
+				// endif
 			}
 
-            var outnode = {
-                tagName: node.tagName || node.compoName,
-                attr: node.attr
-            };
+			this.nodes = master_clone(masterLayout, this.contents).nodes;
+		}
+	};
 
-            if (node.nodes != null) {
-                outnode.nodes = [];
+	mask.registerHandler(tag_layout_VIEW, View);
 
-                var isarray = node.nodes instanceof Array,
-                    length = isarray ? node.nodes.length : 1,
-                    x = null;
-                for (var i = 0; isarray ? i < length : i < 1; i++) {
-					x = isarray ? node.nodes[i] : node.nodes;
+	// UTILS >>
 
-                    if (x.tagName == 'placeholder') {
-                        var value = this.get(x.attr.id);
-                        if (value != null) {
-                            if (value instanceof Array) {
-                                outnode.nodes = outnode.nodes.concat(value);
-                                continue;
-                            }
-                            outnode.nodes.push(value);
-                        }
-                        continue;
-                    }
+	/**
+	 *	if placeholder has no ID attribute,
+	 *	then can _defaultContent template inserted into that
+	 *	placeholder
+	 */
+	function master_clone(node, contents, _defaultContent) {
 
-                    outnode.nodes.push(this.clone(x));
-                }
-            }
-            return outnode;
+		if (node instanceof Array) {
+			var cloned = [];
+			for(var i = 0, x, imax = node.length; i < imax; i++){
+				x = master_clone(node[i], contents, _defaultContent);
 
-        },
-        get: function(id) {
-			var isarray = this.nodes instanceof Array,
-				length = isarray ? this.nodes.length : 1,
-				i = 0,
-				x;
-            for (; i < length; i++) {
-				x = isarray ? this.nodes[i] : this.nodes;
-                if (x.tagName == id) {
-					return x.nodes;
+				if (x == null) {
+					continue;
 				}
-            }
 
-            return null;
-        },
-        render: function(values, container, cntx) {
-            var masterLayout = masters[this.attr.master];
-            if (masterLayout == null){
-                console.error('Master Layout is not defined for', this);
-                return;
-            }
-            this.nodes = this.clone(masterLayout).nodes;
-            mask.render(this.nodes, values, container, cntx);
-        }
-    }));
+				if (x instanceof Array) {
+					cloned = cloned.concat(x);
+					continue;
+				}
+
+				cloned.push(x);
+			}
+			return cloned;
+		}
+
+		if (node.content != null) {
+			return {
+				content: node.content,
+				type: node.type
+			};
+		}
+
+		if (node.tagName === tag_PLACEHOLDER) {
+			var content = node.attr.id ? contents[node.attr.id] : _defaultContent;
+
+			if (!content) {
+				return null;
+			}
+
+			return node.nodes == null //
+			? content //
+			: master_clone(node.nodes, contents, content);
+		}
+
+		var outnode = {
+			tagName: node.tagName || node.compoName,
+			attr: node.attr,
+			type: node.type,
+			controller: node.controller
+		};
+
+		if (node.nodes) {
+			outnode.nodes = master_clone(node.nodes, contents, _defaultContent);
+		}
+
+		return outnode;
+	}
+
+	function view_getContents(node, contents) {
+		if (contents == null) {
+			contents = {};
+		}
+
+		if (node instanceof Array) {
+			var nodes = node;
+			for (var i = 0, x, imax = nodes.length; i < imax; i++) {
+				view_getContents(nodes[i], contents);
+			}
+			return contents;
+		}
+
+		var tagName = node.tagName;
+		if (tagName != null && tagName === tag_CONTENT) {
+			var id = node.attr.id;
+
+			// if DEBUG
+			!id && console.error('@content has no id specified', node);
+			contents[id] && console.error('@content already exists', id);
+			// endif
+
+			contents[id] = view_wrapContentParents(node);
+		}
+
+		if (node.nodes != null) {
+			view_getContents(node.nodes, contents);
+		}
+
+		return contents;
+	}
+
+	function view_wrapContentParents(content) {
+		var parents, parent = content.parent;
+
+		while (parent != null && parent.tagName !== tag_layout_VIEW) {
+			// not a for..in | performance, as we know all keys
+			var p = {
+					type: parent.type,
+					tagName: parent.tagName,
+					attr: parent.attr,
+					controller: parent.controller,
+					nodes: null
+				};
+
+			if (parents == null) {
+				parents = p;
+				parents.nodes = content.nodes;
+			}else{
+				parents.nodes = [p];
+			}
+
+			parent = parent.parent;
+		}
+
+		if (parents != null) {
+			return parents;
+		}
+
+		return content.nodes;
+	}
 
 }());
