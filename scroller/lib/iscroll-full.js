@@ -35,7 +35,7 @@
 		isTouchPad = (/hp-tablet/gi).test(navigator.appVersion),
 
 		has3d = prefixStyle('perspective') in dummyStyle,
-		hasTouch = 'ontouchstart' in window && !isTouchPad,
+		hasTouch = 'supportTouch' in window ? window.supportTouch : ('ontouchstart' in window && !isTouchPad),
 		hasTransform = vendor !== false,
 		hasTransitionEnd = prefixStyle('transition') in dummyStyle,
 
@@ -197,6 +197,7 @@
 
 		handleEvent: function(e) {
 			var that = this;
+			
 			switch (e.type) {
 			case START_EV:
 				if (!hasTouch && e.button !== 0) return;

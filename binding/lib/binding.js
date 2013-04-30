@@ -185,4 +185,56 @@
 	}));
 
 
+	mask.registerUtility('bind', function(property, model, type, cntx, element, attrName){
+		var current = Object.getProperty(model, property);
+		switch(type){
+			case 'node':
+				var node = document.createTextNode(current);
+				Object.observe(model, property, function(value){
+					node.textContent = value;
+				});
+				return node;
+			case 'attr':
+
+				Object.observe(model, property, function(value){
+					var attrValue = element.getAttribute(attrName);
+					element.setAttribute(attrName, attrValue.replace(current, value));
+					current = value;
+				});
+
+				return current;
+		}
+		console.error('Unknown binding type', arguments);
+		return 'Unknown';
+	});
+
+	mask.registerAttrHandler('x-on', function(node, model, value, element, cntx){
+
+		var arr = value.split(';');
+
+		function getHandler(controller, name){
+			if (controller == null) {
+				return null;
+			}
+			if (typeof controller[name] === 'function'){
+				return controller[name].bind(controller);
+			}
+			return getHandler(controller.parent, name);
+		}
+
+		for(var i = 0, x, length = arr.length; i < length; i++){
+			x = arr[i];
+
+			var event = x.substring(0, x.indexOf(':')),
+				handler = x.substring(x.indexOf(':') + 1).trim(),
+				Handler = getHandler(cntx, handler);
+
+			if (Handler){
+				element.addEventListener(event, Handler, false);
+			}
+
+		}
+
+	});
+	
 }());

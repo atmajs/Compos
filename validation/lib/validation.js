@@ -61,8 +61,8 @@ window.include && include.css('styles.css');
 	}
 
 	
-	mask.registerHandler('validate', Class({
-		render: function(model, container, cntx) {
+	mask.registerHandler('validate', Compo({
+		renderStart: function(model, container, cntx) {
 			this.element = container;
 			this.model = model;
 		},
@@ -140,13 +140,9 @@ window.include && include.css('styles.css');
 		//////}
 	}));
 
-	mask.registerHandler('validate:group', Class({
-		Extends: CompoUtils,
-		render: function(model, container, cntx) {
-			mask.renderDom(this.nodes, model, container, cntx);
-		},
+	mask.registerHandler('validate:group', Compo({
 		validate: function() {
-			var validations = this.all('validate');
+			var validations = jmask(this).find('validate');
 			for (var i = 0, x, length = validations.length; i < length; i++) {
 				x = validations[i];
 				if (!x.validate()) return false;

@@ -1,5 +1,5 @@
  include.js({
- 	framework: ['dom/jquery','utils'],
+ 	ruqq: ['dom/jquery','utils'],
 	lib: 'compo',
 	compo: ['binding','validation', 'datepicker']
 })
@@ -46,6 +46,10 @@
 		}
 	});
 	
-	new Compo('#layout').render(model).insert(document.body);
+	new Compo(document.querySelector('#layout').innerHTML).render(model, null, {
+		onclick: function(){
+			alert(';clicked');
+		}
+	}).insert(document.body);
 	
 });

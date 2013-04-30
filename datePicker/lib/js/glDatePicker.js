@@ -86,7 +86,7 @@
 				}
 
 				// Bind click elsewhere to hide
-				$(document).bind("click", function(e)
+				$(document).bind("click.picker", function(e)
 				{
 					methods.hide.apply(self);
 				});
@@ -137,6 +137,11 @@
 		setSelectedDate: function(e)
 		{
 			$(this).data("settings").selectedDate = e;
+		},
+
+		remove: function(){
+			debugger;
+			$(document).unbind('click.picker');
 		},
 
 		// Render the calendar

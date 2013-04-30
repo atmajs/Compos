@@ -1,10 +1,9 @@
 include.js('iscroll.js').done(function() {
-   mask.registerHandler('scroller', Class({
-      Base: Compo,
+   mask.registerHandler('scroller', Compo({
       DOMInsert: function() {
          if (this.scroller == null) this.scroller = new iScroll(this.$[0],{vScrollbar: true, hScrollbar: true});         
       },
-      render: function(values, container, cntx) {
+      renderStart: function(values, container, cntx) {
 
          this.tagName = 'div';
          this.attr.class = (this.attr.class ? this.attr.class + ' ': '') + 'scroller';
@@ -18,7 +17,6 @@ include.js('iscroll.js').done(function() {
          };
          
          
-         Compo.render(this, values, container, cntx);
          Compo.shots.on(this, 'DOMInsert', this.DOMInsert);
          
          return this;

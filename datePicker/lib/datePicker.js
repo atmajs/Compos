@@ -1,12 +1,11 @@
 include.js('js/glDatePicker.min.js').css('css/android.css').done(function() {
 
-	mask.registerHandler('datePicker', Class({
-		Base: Compo,
-		render: function(values, container, cntx) {
+	mask.registerHandler(':datePicker', Compo({
+
+		renderStart: function(values, container, cntx) {
 			this.tagName = 'div';
-			Compo.render(this, values, container, cntx);
-			
-			
+		},
+		onRenderEnd: function(){
 			this.$.glDatePicker({
 				cssName: 'android',
 				allowOld: false,
@@ -26,6 +25,9 @@ include.js('js/glDatePicker.min.js').css('css/android.css').done(function() {
 				this.$.glDatePicker('update');
 			}
         },
+		dispose: function(){
+			this.$.glDatePicker('remove');
+		},
 		getDate: function(date){
 			return this.date;
 		}

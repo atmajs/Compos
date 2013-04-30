@@ -1,16 +1,22 @@
 include.js('iscroll-full.js').done(function() {
-	mask.registerHandler('scroller', Class({
-		Base: Compo,
-		DOMInsert: function() {
-			if (this.scroller == null) {
-				this.scroller = new window.iScroll(this.$[0], {
-					vScrollbar: true,
-					hScrollbar: true
-				});
-				
+	mask.registerHandler('scroller', Compo({
+		slots: {
+			domInsert: function() {
+				if (this.scroller == null) {
+					this.scroller = new window.iScroll(this.$[0], {
+						vScrollbar: true,
+						hScrollbar: true,
+						hideScrollbar: true,
+						fadeScrollbar: true
+					});
+
+					if (this.attr.scrollTo) {
+						this.scroller.scrollTo(0, this.attr.scrollTo | 0);
+					}
+				}
 			}
 		},
-		render: function(model, container, cntx) {
+		onRenderStart: function(model, container, cntx) {
 			
 			this.tagName = 'div';
 			this.attr['class'] = (this.attr['class'] ? this.attr['class'] + ' ' : '') + 'scroller';
@@ -21,9 +27,7 @@ include.js('iscroll-full.js').done(function() {
 				},
 				nodes: this.nodes
 			};
-			Compo.render(this, model, container, cntx);
-			Compo.shots.on(this, 'DOMInsert', this.DOMInsert);
-			return this;
+
 		},
 		dispose: function() {
 			if (this.scroller) {
