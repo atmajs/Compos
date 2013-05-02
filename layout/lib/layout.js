@@ -2,6 +2,7 @@
 
 	var tag_CONTENT = '@content',
 		tag_PLACEHOLDER = '@placeholder',
+		tag_PLACEHOLDER_ELSE = '@else',
 		tag_layout_VIEW = 'layout:view',
 		tag_layout_MASTER = 'layout:master',
 		_masters = {};
@@ -57,6 +58,17 @@
 			var cloned = [];
 			for(var i = 0, x, imax = node.length; i < imax; i++){
 				x = master_clone(node[i], contents, _defaultContent);
+
+				if (x == null) {
+
+					if (node[i].tagName === tag_PLACEHOLDER) {
+						if (i < imax - 1 && node[i + 1].tagName === tag_PLACEHOLDER_ELSE) {
+
+							x = master_clone(node[++i].nodes, contents, _defaultContent);
+						}
+					}
+
+				}
 
 				if (x == null) {
 					continue;
