@@ -58,16 +58,16 @@
 			var cloned = [];
 			for(var i = 0, x, imax = node.length; i < imax; i++){
 				x = master_clone(node[i], contents, _defaultContent);
-
-				if (x == null) {
-
-					if (node[i].tagName === tag_PLACEHOLDER) {
-						if (i < imax - 1 && node[i + 1].tagName === tag_PLACEHOLDER_ELSE) {
-
-							x = master_clone(node[++i].nodes, contents, _defaultContent);
+				
+				if (node[i].tagName === tag_PLACEHOLDER) {
+					
+					if (i < imax - 1 && node[i + 1].tagName === tag_PLACEHOLDER_ELSE) {
+						i += 1;
+						if (x == null) {
+							x = master_clone(node[i].nodes, contents, _defaultContent);
 						}
 					}
-
+					
 				}
 
 				if (x == null) {
