@@ -1,0 +1,12 @@
+.-hidden {
+	display: none;
+}
+
+.-hidden.-show {
+	display: block;
+}
+
+.-tabs.scrollbar > .-tab-panels > .-hidden {
+	display: block;
+}
+
