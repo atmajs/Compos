@@ -1,6 +1,7 @@
-(function() {
+(function(root) {
 
-	var tag_CONTENT = '@content',
+	var mask = root.mask,
+		tag_CONTENT = '@content',
 		tag_PLACEHOLDER = '@placeholder',
 		tag_PLACEHOLDER_ELSE = '@else',
 		tag_layout_VIEW = 'layout:view',
@@ -179,4 +180,4 @@
 		return content.nodes;
 	}
 
-}());
+}(this));
