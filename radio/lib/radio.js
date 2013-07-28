@@ -13,6 +13,8 @@ mask.registerHandler(':radio', mask.Compo({
     
     onRenderEnd: function(){
         this.findItems().on('click', function(event) {
+			debugger;
+			
             var $this = $(event.currentTarget);
             if ($this.hasClass('active'))
                 return;
