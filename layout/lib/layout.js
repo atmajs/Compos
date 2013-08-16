@@ -1,6 +1,6 @@
 (function(root) {
 
-	var mask = root.mask,
+	var mask = root.mask || Mask,
 		tag_CONTENT = '@content',
 		tag_PLACEHOLDER = '@placeholder',
 		tag_PLACEHOLDER_ELSE = '@else',

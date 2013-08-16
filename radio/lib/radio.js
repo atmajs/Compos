@@ -1,66 +1,112 @@
-mask.registerHandler(':radio', mask.Compo({
-    tagName: 'div',
-    attr: {
-        'class': '-radio'
-    },
-    
-    findItems: function(){
-        if (this.attr.selector == null)
-            return this.$.children();
-        
-        return this.$.find(this.attr.selector);
-    },
-    
-    onRenderEnd: function(){
-        this.findItems().on('click', function(event) {
-			debugger;
-			
-            var $this = $(event.currentTarget);
-            if ($this.hasClass('active'))
-                return;
-            
-            $this
-                .parent()
-                .children('.active')
-                .removeClass('active');
-                
-            $this
-                .addClass('active');
-                
-            $this
-                .parent()
-                .trigger('changed', event.currentTarget);
-        });
-    },
-    
-    setActive: function(name){
-        var $el = this.$.find('[name="'+name+'"]');
-        
-        if ($el.hasClass('active'))
-            return;
-        
-        if ($el.length === 0)
-            console.error('[:radio] Item not found', name);
-
-        $el
-            .parent()
-            .children('.active')
-            .removeClass('active');
-            
-        $el
-            .addClass('active');
-    },
-    
-    getActiveName: function(){
-        return this.$.find('.active').attr('name');
-    },
-    
-    getList: function(){
-        var array = [];
-		this.findItems().each(function(index, $x){
-			array.push($x.getAttribute('name'));
-		});
+(function(){
 		
-		return array;
-    }
-}));
+	function route_current(route, path) {
+		var query = path.indexOf('?');
+		if (query !== -1) 
+			path = query.substring(0, query);
+		
+		var _parts = route.split('/'),
+			_index = _parts.length - 1,
+			_default = _parts[_index];
+		
+		_parts = path.split('/');
+		
+		return _index < _parts.length
+			? _parts[_index]
+			: _default;
+	}
+	
+	mask.registerHandler(':radio', mask.Compo({
+		tagName: 'div',
+		attr: {
+			'class': '-radio'
+		},
+		
+		findItems: function(){
+			if (this.attr.selector == null)
+				return this.$.children();
+			
+			return this.$.find(this.attr.selector);
+		},
+		
+		renderStart: function(model, cntx){
+			
+			if (this.attr['x-route']) {
+				var path = cntx.req && cntx.req.url;
+				if (path == null && typeof location !== 'undefined') 
+					path = location.pathname;
+			
+				this.visible = route_current(this.attr['x-route'], path);
+				this.attr['x-route'] = null;
+			}
+		},
+		
+		onRenderEnd: function(){
+			this.findItems().on('click', function(event) {
+				
+				var $this = $(event.currentTarget);
+				if ($this.hasClass('active'))
+					return;
+				
+				$this
+					.parent()
+					.children('.active')
+					.removeClass('active');
+					
+				$this
+					.addClass('active');
+					
+				$this
+					.parent()
+					.trigger('changed', event.currentTarget);
+			});
+		},
+		
+		onRenderEndServer: function(elements, model, cntx){
+				
+			if (this.visible) {
+				var sel = '[name="'
+					+ this.visible
+					+ '"]';
+					
+				var pane = elements[0].querySelector(sel);
+				if (pane) 
+					pane.classList.add('active');
+			}
+			
+		},
+		
+		setActive: function(name){
+			var $el = this.$.find('[name="'+name+'"]');
+			
+			if ($el.hasClass('active'))
+				return;
+			
+			if ($el.length === 0)
+				console.error('[:radio] Item not found', name);
+	
+			$el
+				.parent()
+				.children('.active')
+				.removeClass('active');
+				
+			$el
+				.addClass('active');
+		},
+		
+		getActiveName: function(){
+			return this.$.find('.active').attr('name');
+		},
+		
+		getList: function(){
+			var array = [];
+			this.findItems().each(function(index, $x){
+				array.push($x.getAttribute('name'));
+			});
+			
+			return array;
+		}
+	}));
+	
+
+}());

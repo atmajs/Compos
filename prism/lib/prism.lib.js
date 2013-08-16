@@ -234,6 +234,7 @@
 					}
 
 					pattern.lastIndex = 0;
+			
 
 					var match = pattern.exec(str);
 

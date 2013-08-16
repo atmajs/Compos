@@ -1,6 +1,8 @@
 include
 	.js('marked.js')
-	.done(function() {
+	.done(function(resp) {
+		
+	var Marked = resp.marked || window.marked;
 
 	var str_trimTrailings = (function() {
 
@@ -26,10 +28,8 @@ include
 	}());
 
 
-	mask.registerHandler(':markdown', Class({
-		Base: Compo,
-		Extends: Class.Deferred,
-		Construct: function() {
+	mask.registerHandler(':markdown', Compo({
+		constructor: function() {
 			this.tagName = 'div';
 			this.attr = {
 				'class': '-markdown'
@@ -37,43 +37,38 @@ include
 		},
 		
 
-		renderStart: function() {
+		renderStart: function(model, cntx) {
 
-			if (this.attr.src != null)
-				return;
+			if (this.attr.src != null){
+			    var that = this;
+                
+                Compo.pause(this, cntx);
+                
+                Compo
+                    .resource(this)
+                    .ajax(this.attr.src + '::Data')
+                    .done(function(resp) {
+                        
+                        set_markdownContent(that, resp.ajax.Data);
+						
+                        Compo.resume(that, cntx);
+                    });
+                    
+                return;
+			}
 
 			var md = str_trimTrailings(jmask(this).text());
 
-			this.nodes = jmask(':html')
-				.text(highlight(md));
-		},
-
-		onRenderEnd: function(elements, model, cntx) {
-			if (this.attr.src == null)
-				return;
-
-			var that = this;
-			include
-				.instance()
-				.ajax(this.attr.src + '::Data')
-				.done(function(resp) {
-				that
-					.$
-					.get(0)
-					.innerHTML = highlight(resp.ajax.Data);
-			});
-
-			(cntx.promise || (cntx.promise = []))
-				.push(this);
-
+			set_markdownContent(this, md);
 		}
 	}));
 
-	function highlight(md) {
-		return marked(md);
+	function set_markdownContent(compo, str) {
+		compo.nodes = jmask(':html').text(Marked(str));
 	}
+	
 
-	marked.setOptions({
+	Marked.setOptions({
 		gfm: true,
 		pedantic: false,
 		sanitize: false,

@@ -22,6 +22,38 @@ include
 		
 		return $col;
 	}
+	
+	function route_current(route, path) {
+		var query = path.indexOf('?');
+		if (query !== -1) 
+			path = path.substring(0, query);
+		
+		var _parts = route.split('/'),
+			_length = _parts.length,
+			_default = _parts[_length - 1],
+			
+			_path = path.split('/');
+			
+		
+		if (_length > _path.length) {
+			return _default !== '-'
+				? _default
+				: null;
+		}
+		
+		var i = _length - 1;
+		while (--i > -1) {
+			if (_parts[i] === '-')
+				break;
+			
+			// in case we care about parents path
+			// '/-/strict/tabName'
+			if (_parts[i] !== _path[i]) 
+				return null;
+		}
+		
+		return _path[_length - 1];
+	}
 
 	mask.registerHandler(':tabs', mask.Compo({
 		tagName: 'div',
@@ -54,26 +86,51 @@ include
 			if (this.attr.anchors) {
 				return this
 					.$
-					.find('.-tab-panels')
+					.find('.-tab-panels:eq(0)')
 					.find('a[name]');
 			}
 			
 			
-			return this.$.find(klass);
+			return this
+				.$
+				.find('.-tab-' + type + 's:eq(0)')
+				.children(klass);
 		},
 		_getHeaders: function(){
 			
 		},
-		renderStart: function(){
-			
-			if (this.attr.anchors) {
-				this.attr.scrollbar = true;
+		
+		slots: {
+			domInsert: function(){
+				
+				if (!this.attr.scrollbar) 
+					return;
+				
+				if (!this.attr.visible) 
+					return;
+				
+				this.setActive(this.attr.visible);
 			}
+		},
+		
+		renderStart: function(model, cntx){
 			
+			if (this.attr.anchors) 
+				this.attr.scrollbar = true;
 			
 			if (this.attr.scrollbar) 
 				this.attr['class'] += ' scrollbar';
 			
+			if (this.attr['x-route']) {
+				var path = cntx.req && cntx.req.url;
+				if (path == null && typeof location !== 'undefined') 
+					path = location.pathname;
+			
+				this.visible = route_current(this.attr['x-route'], path);
+				this.attr['x-route'] = null;
+				
+				this.attr.visible = this.visible;
+			}
 	
 			var $this = jmask(this),
 				$panels = $this.children('@panels'),
@@ -88,19 +145,36 @@ include
 				var x = this._children($panels.children());
 				
 				if (x.length === 0) {
-					console.error('[:tabs] > has no panels');
+					console.error('[:tabs] > has no els in @panels tag');
 					return;
 				}
+				
 				x.addClass('-tab-panel -hidden');
-			
 			}
 			
-			this._children($header.children()).addClass('-tab-header -hidden');
+			this
+				._children($header.children())
+				.addClass('-tab-header -hidden');
+		},
+		
+		onRenderEndServer: function(elements, model, cntx){
+			
+			if (this.visible && !this.attr.scrollbar) {
+				
+				var sel = '[name="'
+					+ this.visible
+					+ '"].-tab-panel';
+					
+				var pane = elements[0].querySelector(sel);
+				if (pane) 
+					pane.classList.add('-show');
+			}
+			
 		},
 	
 		onRenderEnd: function(){
 			if (this.attr.scrollbar) {
-				this.scroller = this.closest('scroller');
+				this.scroller = this.closest(':scroller');
 				this.scroller.on('scroll', '', this._scrolled.bind(this));
 			}
 			
@@ -206,7 +280,10 @@ include
 			}
 		},
 		_scrollInto: function($el){
-			this.scroller.scroller.scrollToElement($el[0]);
+			this
+				.scroller
+				.scroller
+				.scrollToElement($el[0]);
 		},
 		_activeName: null,
 	
@@ -226,7 +303,8 @@ include
 			
 			if (this.attr.scrollbar) {
 				if ($panel.length == 0) {
-					debugger;
+					console.error('[:tabs] panel not found', name);
+					return;
 				}
 				this._scrollInto($panel);
 			}
@@ -253,10 +331,6 @@ include
 		},
 		getActiveName: function(){
 			return this._activeName;
-			//////this
-			//////	.$
-			//////	.find('.-tab-panel.-show')
-			//////	.attr('name');
 		},
 		
 		getList: function(){

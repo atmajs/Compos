@@ -12,6 +12,7 @@ include
 			tagName: 'div',
 			slots: {
 				domInsert: function() {
+					
 					if (this.scroller == null) {
 						this.scroller = new window.iScroll(this.$[0], {
 							vScrollbar: true,
@@ -38,6 +39,9 @@ include
 					nodes: this.nodes
 				};
 	
+			},
+			onRenderEnd: function(){
+				
 			},
 			dispose: function() {
 				if (this.scroller) {
