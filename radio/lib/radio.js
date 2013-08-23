@@ -56,9 +56,15 @@
 				$this
 					.addClass('active');
 					
-				$this
-					.parent()
-					.trigger('changed', event.currentTarget);
+				var $parent = $this
+					.parent();
+					
+				
+				// obsolete, to support generic HTML 'change' event
+				$parent.trigger('changed', event.currentTarget);
+				
+				$parent.trigger('change', event.currentTarget);
+				
 			});
 		},
 		
