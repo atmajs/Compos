@@ -8,8 +8,10 @@ include
 		if (child.type === mask.Dom.NODE) 
 			return child;
 		
-		if (child.controller && child.controller.prototype.tagName) 
+		
+		if (child.controller && child.controller.prototype.tagName){
 			return child;
+		}
 		
 		var $col = jmask(),
 			$children = jmask(child).children(),
@@ -130,12 +132,13 @@ include
 				this.attr['x-route'] = null;
 				
 				this.attr.visible = this.visible;
+				
 			}
 	
 			var $this = jmask(this),
 				$panels = $this.children('@panels'),
 				$header = $this.children('@header');
-	
+			
 			$panels.tag('div').addClass('-tab-panels');
 			$header.tag('div').addClass('-tab-headers');
 	
@@ -168,6 +171,12 @@ include
 				var pane = elements[0].querySelector(sel);
 				if (pane) 
 					pane.classList.add('-show');
+					
+				
+				
+				if (!pane) {
+					debugger;
+				}
 			}
 			
 		},
@@ -214,6 +223,9 @@ include
 			animation.start(callback, panel);
 		},
 		_getAnimation: function(ani){
+			if (this.components == null)
+				return null;
+			
 			// cache ?
 			var animation;
 			for (var i = 0, x, imax = this.components.length; i < imax; i++){

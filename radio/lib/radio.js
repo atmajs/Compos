@@ -42,30 +42,32 @@
 		},
 		
 		onRenderEnd: function(){
-			this.findItems().on('click', function(event) {
-				
-				var $this = $(event.currentTarget);
-				if ($this.hasClass('active'))
-					return;
-				
-				$this
-					.parent()
-					.children('.active')
-					.removeClass('active');
+			this
+				.findItems()
+				.on('click', function(event) {
 					
-				$this
-					.addClass('active');
+					var $this = $(event.currentTarget);
+					if ($this.hasClass('active'))
+						return;
 					
-				var $parent = $this
-					.parent();
+					$this
+						.parent()
+						.children('.active')
+						.removeClass('active');
+						
+					$this
+						.addClass('active');
+						
+					var $parent = $this
+						.parent();
+						
 					
-				
-				// obsolete, to support generic HTML 'change' event
-				$parent.trigger('changed', event.currentTarget);
-				
-				$parent.trigger('change', event.currentTarget);
-				
-			});
+					// obsolete, to support generic HTML 'change' event
+					$parent.trigger('changed', event.currentTarget);
+					
+					$parent.trigger('change', event.currentTarget);
+					
+				});
 		},
 		
 		onRenderEndServer: function(elements, model, cntx){

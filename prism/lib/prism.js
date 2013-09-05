@@ -27,6 +27,7 @@ include
                 
                 Compo.pause(this, cntx);
                 
+				
                 Compo
                     .resource(this)
                     .ajax(this.attr.src + '::Data')
