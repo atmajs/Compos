@@ -1,13 +1,13 @@
 /**
- * prism.js default theme for JavaScript, CSS and HTML
- * Based on dabblet (http://dabblet.com)
- * @author Lea Verou
+ * okaidia theme for JavaScript, CSS and HTML
+ * Loosely based on Monokai textmate theme by http://www.monokai.nl/
+ * @author ocodia
  */
 
 code[class*="language-"],
 pre[class*="language-"] {
-	color: black;
-	text-shadow: 0 1px white;
+	color: #f8f8f2;
+	text-shadow: 0 1px rgba(0,0,0,0.3);
 	font-family: Consolas, Monaco, 'Andale Mono', monospace;
 	direction: ltr;
 	text-align: left;
@@ -29,13 +29,13 @@ pre[class*="language-"] {
 	padding: 1em;
 	margin: .5em 0;
 	overflow: auto;	
-	font-size:.93em;
+	border-radius: 0.3em;
 }
-/*
+
 :not(pre) > code[class*="language-"],
 pre[class*="language-"] {
-	background: #f5f2f0;
-}*/
+	background: #272822;
+}
 
 /* Inline code */
 :not(pre) > code[class*="language-"] {
@@ -51,7 +51,7 @@ pre[class*="language-"] {
 }
 
 .token.punctuation {
-	color: #999;
+	color: #f8f8f2;
 }
 
 .namespace {
@@ -59,38 +59,44 @@ pre[class*="language-"] {
 }
 
 .token.property,
-.token.tag,
-.token.boolean,
-.token.number {
-	color: #905;
+.token.tag {
+	color: #f92672;
 }
 
+.token.boolean,
+.token.number{
+	color: #ae81ff;
+}
 
 .token.selector,
+.token.attr-name,
 .token.string {
-	color: #690;
+	color: #a6e22e;
 }
+
 
 .token.operator,
 .token.entity,
 .token.url,
 .language-css .token.string,
-.language-mask .token.string,
 .style .token.string {
-	color: #a67f59;
-	background: hsla(0,0%,100%,.5);
+	color: #f8f8f2;
 }
 
 .token.atrule,
-.token.attr-value,
-.token.keyword {
-	color: #07a;
+.token.attr-value
+{
+	color: #e6db74;
 }
 
 
+.token.keyword{
+color: #66d9ef;
+}
+
 .token.regex,
 .token.important {
-	color: #e90;
+	color: #fd971f;
 }
 
 .token.important {
@@ -99,18 +105,4 @@ pre[class*="language-"] {
 
 .token.entity {
 	cursor: help;
-}
-
-
-/** mask */
-.language-mask .token.tag { font-weight: bold; }
-.token.compo{ color: #008E8E; font-weight: bold; }
-.token.interpolation{ color: #D24726; }
-
-.token.class{ color: #306772; }
-.token.id{ color: #008299; }
-.token.attr-name {color: #8C0095;}
-.language-mask .token.attr-value{
-	background: inherit;
-	color: #690;
 }

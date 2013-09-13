@@ -12,35 +12,42 @@ include
             language: 'javascript'
         },
         
-        renderStart: function(model, cntx) {
+        renderStart: function(model, ctx) {
 
             var _lang = this.attr.language,
                 _class = 'language-' + _lang,
-                _code = jmask('pre.' + _class + ' > code.' + _class)
-                    .children()
-                    .mask(this.nodes);
-
-            this.nodes = _code.end();
+                _code;
 
             if (this.attr.src != null) {
                 var that = this;
-                
-                Compo.pause(this, cntx);
-                
 				
+				this.nodes = jmask('pre.' + _class + ' > code.' + _class);
+				
+				_code = this.nodes.find('code');
+                
+                Compo.pause(this, ctx);
+                
+				var name = this.attr.src;
                 Compo
                     .resource(this)
-                    .ajax(this.attr.src + '::Data')
+                    .ajax(this.attr.src + '::' + name)
                     .done(function(resp) {
                         
-                        highlight(_code, resp.ajax.Data, _lang);
-                        Compo.resume(that, cntx);
+						
+                        highlight(_code, resp.ajax[name], _lang);
+                        Compo.resume(that, ctx);
                     });
                     
                 return;
             }
-            
-            highlight(_code, str_trimTrailings(_code.text(model)), _lang);
+			
+            _code = jmask('pre.' + _class + ' > code.' + _class)
+				.children()
+				.mask(this.nodes);
+				
+			this.nodes = _code.end();
+				
+            highlight(_code, str_trimTrailings(_code.text(model, ctx, this)), _lang);
         }
     });
     

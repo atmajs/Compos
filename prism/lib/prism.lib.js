@@ -403,6 +403,7 @@ Prism.hooks.add('wrap', function(env) {
 		env.attributes['title'] = env.content.replace(/&amp;/, '&');
 	}
 });;
+
 Prism.languages.css = {
 	'comment': /\/\*[\w\W]*?\*\//g,
 	//'atrule': /@[\w-]+?(\s+[^;{]+)?(?=\s*{|\s*;)/gi,
@@ -469,6 +470,136 @@ if (Prism.languages.markup) {
 		}
 	});
 };
+
+
+
+Prism.languages.mask = {
+	'comment': {
+		pattern: /(^|[^\\])(\/\*[\w\W]*?\*\/|\/\/.*?(\r?\n|$))/g,
+		lookbehind: true
+	},
+	
+	'string': {
+		pattern: /(^\s*|[>;{}'"]\s*)("|')(\\?.)*?\2/g,
+		lookbehind:true,
+		inside: {
+			'interpolation': {
+				pattern: /~\[[^\]]+\]/g,
+				inside: {
+					'expression': {
+						pattern: /(~\[\w*:)([^\]]+)/i,
+						lookbehind: true,
+						inside: {
+							rest: Prism.languages.javascript
+						}
+					}
+				}
+			}
+		}
+	},
+	
+	'punctuation': /[\{\};>]|(&gt;)/g,
+	'node': {
+		pattern: /[^\s][^{;>]+/gi,
+		inside: {
+			'interpolation': {
+				pattern: /~\[[^\]]+\]/g,
+				inside: {
+					'expression': {
+						pattern: /(~\[\w*:)([^\]]+)/i,
+						lookbehind: true,
+						inside: {
+							rest: Prism.languages.javascript
+						}
+					}
+				}
+			
+			},
+			'compo': {
+				pattern: /^[^\s\w\.#][\w\d:-]*/i
+			},
+			'tag': {
+				pattern: /^[\w\d:-]+/i
+			}, 
+			'attr-value': {  
+				pattern: /(=\s*\w+)|(("|')(\\?.)*?\3)/gi,
+				inside: {
+					'punctuation': /=|&gt;|"/g 
+				}
+			},   
+			'class': {
+				pattern: /\.[\w\d-_]+/gi
+			},
+			'id': {
+				pattern: /#[\w\d-_]+/gi
+			},
+			
+			'punctuation': /=/g,
+			'attr-name': {
+				pattern: /[\w:-]+/g,
+				inside: {
+					'namespace': /^[\w-]+?:/
+				}
+			}            
+		}
+	},
+	'ignore': /&(lt|gt|amp);/gi 
+	//'atrule': /@[\w-]+?(\s+[^'\{]+)?(?=\s*{|\s*')/gi,
+	
+};
+
+
+if (Prism.languages.markup) {
+	Prism.languages.insertBefore('markup', 'script', {
+		'mask': {
+			pattern: /(&lt;|<)script type='text\/mask'[\w\W]*?(>|&gt;)[\w\W]*?(&lt;|<)\/script(>|&gt;)/ig,
+			inside: {
+				'tag': {
+					pattern: /(&lt;|<)script[\w\W]*?(>|&gt;)|(&lt;|<)\/script(>|&gt;)/ig,
+					inside: Prism.languages.markup.tag.inside
+				},
+				rest: Prism.languages.mask
+			}
+		}
+	});
+};
+// Prism.languages.scss = Prism.languages.extend('css', {
+//     'comment': {
+//         pattern: /(^|[^\\])(\/\*[\w\W]*?\*\/|\/\/.*?(\r?\n|$))/g,
+//         lookbehind: true
+//     },
+//     // aturle is just the @***, not the entire rule (to highlight var & stuffs)
+//     // + add ability to highlight number & unit for media queries
+//     'atrule': /@[\w-]+(?=\s+(\(|\{|;))/gi,
+//     // url, compassified
+//     'url': /([-a-z]+-)*url(?=\()/gi,
+//     // CSS selector regex is not appropriate for Sass
+//     // since there can be lot more things (var, @ directive, nesting..)
+//     // a selector must start at the end of a property or after a brace (end of other rules or nesting)
+//     // it can contain some caracters that aren't used for defining rules or end of selector, & (parent selector), or interpolated variable
+//     // the end of a selector is found when there is no rules in it ( {} or {\s}) or if there is a property (because an interpolated var
+//     // can "pass" as a selector- e.g: proper#{$erty})
+//     // this one was ard to do, so please be careful if you edit this one :)
+//     'selector': /([^@;\{\}\(\)]?([^@;\{\}\(\)]|&amp;|\#\{\$[-_\w]+\})+)(?=\s*\{(\}|\s|[^\}]+(:|\{)[^\}]+))/gm
+// });
+ 
+// Prism.languages.insertBefore('scss', 'atrule', {
+//     'keyword': /@(if|else if|else|for|each|while|import|extend|debug|warn|mixin|include|function|return)|(?=@for\s+\$[-_\w]+\s)+from/i
+// });
+ 
+// Prism.languages.insertBefore('scss', 'property', {
+//     // var and interpolated vars
+//     'variable': /((\$[-_\w]+)|(#\{\$[-_\w]+\}))/i
+// });
+ 
+// Prism.languages.insertBefore('scss', 'ignore', {
+//     'placeholder': /%[-_\w]+/i,
+//     'statement': /\B!(default|optional)\b/gi,
+//     'boolean': /\b(true|false)\b/g,
+//     'null': /\b(null)\b/g,
+//     'operator': /\s+([-+]{1,2}|={1,2}|!=|\|?\||\?|\*|\/|\%)\s+/g
+// });
+
 (function(){
 
 
