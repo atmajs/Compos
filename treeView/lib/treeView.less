@@ -1,0 +1,71 @@
+.-treeView-tree {
+    list-style: none;
+    padding-left: 1.5em;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.-treeView-item {
+    
+    &.__sub > .-treeView-head {
+        cursor: pointer;
+    }
+    
+    &.__sub-hidden > .-treeView-sub {
+        display: none;
+    }
+    
+    &.__sub-hidden > .-treeView-head > .-treeView-arrow {
+        
+        -webkit-transform: rotate(-90deg);
+    }
+}
+
+.-treeView-item > .-treeView-head {
+    & > .-treeView-arrow {
+        display: none;
+    }
+    & > .-treeView-knob {
+        display: inline-block;
+    }
+}
+
+.-treeView-item.__sub > .-treeView-head {
+    & > .-treeView-arrow {
+        display: inline-block;
+    }
+    & > .-treeView-knob {
+        display: none;
+    }
+}
+
+
+
+.-treeView-knob, .-treeView-arrow {
+    
+    width: 18px;
+}
+.-treeView-knob, .-treeView-title, .-treeView-arrow {
+    
+    vertical-align: middle;
+    text-align: center;
+}
+
+.-treeView-knob, .-treeView-arrow {
+    opacity: .5;
+}
+.-treeView-knob {
+    font-size: 1.8em;
+    line-height: .9em;
+}
+
+.-treeView-arrow {
+    font-size: .8em;
+    line-height: 1.1em;
+    -webkit-transition: -webkit-transform 100ms ease-out;
+    -webkit-transform: rotate(0deg);
+}
+.-treeView-title {
+    display: inline-block;
+    padding: 0px 5px;
+}

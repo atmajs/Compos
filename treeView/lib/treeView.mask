@@ -1,0 +1,31 @@
+
+:template #treeView-item {
+    li
+        .-treeView-item
+        .~[: items.length ? '__sub' ]
+        .~[: selectedItem == id ? 'selected' ]
+        data-tree-id='~[id]' {
+        
+        .-treeView-head {
+            .-treeView-arrow > '▼'
+            .-treeView-knob > '•'
+        
+            .-treeView-title >
+                '~[title]'
+        }
+        
+        .-treeView-sub >
+            % if='items.length' >
+                % use='items' >
+                    :import #treeView-tree;
+    }
+}
+
+
+:template #treeView-tree {
+    ul.-treeView-tree >
+        % each='.' >
+            :import #treeView-item;
+}
+
+:import #treeView-tree;
