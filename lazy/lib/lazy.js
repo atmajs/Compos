@@ -4,8 +4,8 @@
 		mask = atma.mask;
 	
 	
-	mask.registerHandler(':lazy', Compo({
-		
+	mask.registerHandler(':lazy', mask.Compo({
+		mode: 'server',
 		_deferredNodes: null,
 		onRenderStart: function(model, ctx, container){
 			
@@ -20,7 +20,7 @@
 			container.appendChild(this.placeholder);
 		},
 		
-		lazyShow: function(){
+		resolveLazy: function(){
 			this.lazyShow = function(){};
 			
 			var fragment = mask.render(this._deferredNodes, this.model, this.ctx, null, this),

@@ -5,6 +5,9 @@ include
 
     var Prism = resp.Prism || window.Prism;
 
+    if (typeof global !== 'undefined') {
+        global.Prism = Prism;
+    }
 
     var PrismCompo = Compo({
         mode: 'server:all',

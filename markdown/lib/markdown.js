@@ -79,17 +79,11 @@ include
 			if (typeof Prism === 'undefined')
 				return code;
 			
-			if (lang == null) 
+			if (lang in Prism.languages === false) 
 				lang = 'javascript';
+
 			
-
-
-			if (lang && lang in Prism.languages) {
-				return Prism.highlight(code, Prism.languages[lang]);
-			}
-
-			return Prism.highlight(code);
-
+			return Prism.highlight(code, Prism.languages[lang]);
 		}
 	});
 
