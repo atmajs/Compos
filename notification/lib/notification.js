@@ -1,4 +1,7 @@
-include.css('style.css').load('view.mask').done(function(response) {
+include
+	.css('notification.css')
+	.load('notification.mask')
+	.done(function(resp) {
 
     if (typeof $L == 'undefined') {
         $L = function(arg) {
@@ -6,120 +9,128 @@ include.css('style.css').load('view.mask').done(function(response) {
         }
     }
 
-    var w = window,
-        template = response.load[0],
-        stack = [],
+    var template = resp.load.notification,
         $t = null,
         $container = null,
-        $exceptionContainer = null,
-        width = 350,
-        $alert = null,
-        $overlay;
+        $exceptionContainer = null
+		;
     
-    template = "<div class='ui-notify-message ui-notify-message-style #{type}'>\
-                    <div>\
-                        <a class='ui-notify-cross ui-notify-close' href='#'>x</a>\
-                        <h1>#{title}</h1>\
-                        <div class='ui-notify-icon'></div>\
-                        <p>#{message}</p>\
-                        </div>\
-                </div>"
-	
-
-    function argumentsToHtmlMessage() {
-        var message = '';
-        for (var i = 0; i < arguments.length; i++) {
-            if (typeof arguments[i] == 'string') message += arguments[i] + '<br/>';
-            else message += JSON.stringify(arguments[i]) + '<br/>';
-
+    function argsToMessage(args) {
+        var message = '',
+			i = 0,
+			imax = args.length,
+			x;
+			
+        for (; i < imax; i++) {
+			
+			x = args[i];
+			message  += typeof x === 'string'
+				? x 
+				: JSON.stringify(x, null, 4)
+				;
         }
+		
         return message;
-    }(w.compo || (w.compo = {})).Notification = {
+    };
+	
+	if (window.compo == null) 
+		window.compo = {};
+	
+	
+    window.compo.Notification = {
         exception: function(error) {
-            var message;
-            if (typeof error == 'string') message = error.replace(/\n/g, '<br\>');
-            else message = JSON.stringify(error);
+            
+			var message = typeof error == 'string'
+				? error
+				: JSON.stringify(error, null, 4);
+            
 
-            this.show({
-                type: 'exception',
-                message: message
-            });
+            this.show(argsToMessage(arguments), 'exception');
         },
         warn: function() {
-            var message = argumentsToHtmlMessage.apply(this, arguments);
-            d.error('warn notification:', message);
-            this.show(message, 'warn');
+            
+            this.show(argsToMessage(arguments), 'warn');
         },
         error: function() {
-            var message = argumentsToHtmlMessage.apply(this, arguments);
-            console.error('error notification:', message);
-            this.show(message, 'error');
+			
+            this.show(argsToMessage(arguments), 'error');
         },
         success: function() {
 
-            var message = argumentsToHtmlMessage.apply(this, arguments);
-            this.show(message, 'success');
+            
+            this.show(argsToMessage(arguments), 'success');
         },
-        /** { type : info{default}, success, warn, error
-         *      message
-         *      title?
-         */
-        show: function(data, type) {
-            if (typeof data == 'string') {
-                data = {
-                    type: type,
-                    message: data
-                };
+        
+		
+        show: function(message, type) {
+			
+			var title = getTitle(type);
+			
+            if ($container == null) {
+				
+				initialize();
             }
-            if (!data.type) data.type = 'info';
-            if (!data.title) {
-                switch (data.type) {
-                case 'success':
-                    data.title = $L('Done');
-                    break;
-                case 'error':
-                    data.title = $L('Error');
-                    break;
-                case 'warn':
-                    data.title = $L('Warning');
-                    break;
-                case 'exception':
-                    data.title = $L('Exception');
-                    data.type = 'error exception';
-                    break;
-                case 'info':
-                    data.title = $L('Info');
-                    break;
-                }
-            }
+            
+			
+			$t
+				.removeClass('success error warn info')
+				.addClass(type);
+				
+			$t
+				.find('pre')
+				.text(message);
+			$t
+				.find('h1')
+				.text(title);
+		
 
-            if (!$container) {
-                $container = $('<div class="ui-notify"></div>').appendTo($('body'));
-            }
-            if (data.type.indexOf('exception') > -1 && !$exceptionContainer) {
-                $exceptionContainer = $('<div class="ui-notify exception"></div>').appendTo($('body'));
-            }
-
-            if (!$t) {
-                $t = $(String.format(template,data));
-            } else {
-                $t.removeClass('success error warn info').addClass(data.type);
-                $t.find('p').html(data.message);
-                $t.find('h1').text(data.title);
-            }
-
-            var $div = $t.clone().prependTo(data.type.indexOf('exception') == -1 ? $container : $exceptionContainer); 
+            var $div = $t
+				.clone()
+				.prependTo(type === 'exception' ? $exceptionContainer : $container); 
 
 
 
-            new ruqq.animate.Model3({
-                model: '-webkit-transform | translate3d(0px, -250px, 0px) > translate3d(0px, 0px, 0px) | 200ms',
-                next: '-webkit-transform | > translate3d(300px, 0px, 0px) | 100ms linear 4s'
-            }).start($div[0], function() {
+            mask.animate($div.get(0), {
+                model: 'transform | translate3d(0px, -250px, 0px) > translate3d(0px, 0px, 0px) | 200ms',
+                next: 'transform | > translate3d(300px, 0px, 0px) | 100ms linear 4s'
+            }, function() {
                 $div.remove()
             });
 
 
         }
     };
+	
+	
+	
+	function initialize(args) {
+		var compo = Compo.initialize(Compo({
+					
+			template: '.ui-notify; .ui-notify.exception',
+			events: {
+				'click: .ui-notify-close': function(event){
+					var $div = $(event.currentTarget).closest('.ui-notify-message');
+					
+					$div.remove();
+				}
+			}
+			
+		}), null, document.body);
+		
+		$container = compo.$.first();
+		$exceptionContainer = compo.$.last();
+		$t = $(mask.render(template, {}));
+	}
+	
+	var titles = {
+		success: 'Done',
+		error: 'Error',
+		warn: 'Warning',
+		exception: 'Exception',
+		info: 'Info'
+	};
+	
+	function getTitle(type){
+		return $L(titles[type]);
+	}
 });

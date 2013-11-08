@@ -3,7 +3,7 @@
 include
 	
 	.client()
-	.js('iscroll-full.js')
+	.js('./iscroll-full.js')
 	
 	.done(function() {
 
@@ -17,8 +17,13 @@ include
 						this.scroller = new window.iScroll(this.$[0], {
 							vScrollbar: true,
 							hScrollbar: true,
-							hideScrollbar: true,
-							fadeScrollbar: true
+							hideScrollbar: this.attr['x-show'] ? false : true,
+							fadeScrollbar: true,
+							
+							onTouchEnd: function(event){
+								
+								event.stopPropagation();
+							}
 						});
 	
 						if (this.attr.scrollTo) {
@@ -29,7 +34,7 @@ include
 			},
 			onRenderStart: function(model, container, cntx) {
 				
-				this.tagName = 'div';
+				
 				this.attr['class'] = (this.attr['class'] ? this.attr['class'] + ' ' : '') + 'scroller';
 				this.nodes = {
 					tagName: 'div',
@@ -40,9 +45,7 @@ include
 				};
 	
 			},
-			onRenderEnd: function(){
-				
-			},
+			
 			dispose: function() {
 				if (this.scroller) {
 					this.scroller.destroy();

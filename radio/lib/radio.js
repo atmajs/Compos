@@ -19,7 +19,8 @@
 	mask.registerHandler(':radio', mask.Compo({
 		tagName: 'div',
 		attr: {
-			'class': '-radio'
+			// add manually appropriate class
+			//-'class': '-radio'
 		},
 		
 		findItems: function(){
@@ -29,10 +30,14 @@
 			return this.$.find(this.attr.selector);
 		},
 		
-		renderStart: function(model, cntx){
+		renderStart: function(model, ctx){
+			
+			if (this.attr['as']) {
+				this.tagName = this.attr['as'];
+			}
 			
 			if (this.attr['x-route']) {
-				var path = cntx.req && cntx.req.url;
+				var path = ctx.req && ctx.req.url;
 				if (path == null && typeof location !== 'undefined') 
 					path = location.pathname;
 			

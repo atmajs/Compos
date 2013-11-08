@@ -5,7 +5,10 @@
  */
  
 ;(function() {
- 
+
+var tag_P = '<p>'
+  , tag_P_END = '</p>'
+  ;
 /**
  * Block-Level Grammar
  */
@@ -825,6 +828,12 @@ Parser.prototype.parseText = function() {
  */
  
 Parser.prototype.tok = function() {
+  var hooks = this.options.hooks
+    , hook = hooks && hooks[this.token.type]
+    ;
+  if (hook) 
+    return hook(this.token);
+  
   switch (this.token.type) {
     case 'space': {
       return '';
@@ -959,14 +968,16 @@ Parser.prototype.tok = function() {
         : this.token.text;
     }
     case 'paragraph': {
-      return '<p>'
+      return tag_P
         + this.inline.output(this.token.text)
-        + '</p>\n';
+        + tag_P_END
+        + '\n';
     }
     case 'text': {
-      return '<p>'
+      return tag_P
         + this.parseText()
-        + '</p>\n';
+        + tag_P_END
+        + '\n';
     }
   }
 };

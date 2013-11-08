@@ -29,21 +29,17 @@ include
 
 
 	mask.registerHandler(':markdown', Compo({
-		constructor: function() {
-			this.tagName = 'div';
-			this.attr = {
-				'class': '-markdown'
-			};
+		tagName: 'div',
+		attr: {
+			'class': '-markdown'
 		},
 		
-
 		renderStart: function(model, cntx) {
 
 			if (this.attr.src != null){
 			    var that = this;
                 
                 Compo.pause(this, cntx);
-                
                 Compo
                     .resource(this)
                     .ajax(this.attr.src + '::Data')
@@ -58,8 +54,13 @@ include
 			}
 
 			var md = str_trimTrailings(jmask(this).text());
-
-			set_markdownContent(this, md);
+	
+			if (md) 
+				set_markdownContent(this, md);
+		},
+		
+		markdown: function(markdown){
+			this.$.get(0).innerHTML = Marked(markdown);
 		}
 	}));
 
@@ -67,7 +68,7 @@ include
 		compo.nodes = jmask(':html').text(Marked(str));
 	}
 	
-
+	
 	Marked.setOptions({
 		gfm: true,
 		pedantic: false,

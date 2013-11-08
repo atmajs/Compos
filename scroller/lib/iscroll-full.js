@@ -497,6 +497,7 @@
 		},
 
 		_end: function(e) {
+			
 			if (hasTouch && e.touches.length !== 0) return;
 
 			var that = this,
@@ -630,7 +631,8 @@
 				if (that.options.onTouchEnd) that.options.onTouchEnd.call(that, e);
 				return;
 			}
-
+			
+			
 			that._resetPos(200);
 			if (that.options.onTouchEnd) that.options.onTouchEnd.call(that, e);
 		},
