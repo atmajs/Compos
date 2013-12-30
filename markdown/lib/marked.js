@@ -6,8 +6,8 @@
  
 ;(function() {
 
-var tag_P = '<p>'
-  , tag_P_END = '</p>'
+var tag_P = '<br/><br/>'
+  , tag_P_END = '<br/><br/>'
   ;
 /**
  * Block-Level Grammar
@@ -968,7 +968,7 @@ Parser.prototype.tok = function() {
         : this.token.text;
     }
     case 'paragraph': {
-      return tag_P
+      return (tag_P)
         + this.inline.output(this.token.text)
         + tag_P_END
         + '\n';

@@ -1,0 +1,12 @@
+
+.ui-notify-message.ui-notify-message-style.~[type] {
+	
+	a.ui-notify-cross.ui-notify-close href='#' > 'x'
+	h1 > '~[title]'
+	
+	.ui-notify-icon;
+	
+	pre >
+		'~[message]'
+
+}

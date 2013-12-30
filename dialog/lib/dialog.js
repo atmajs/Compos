@@ -30,7 +30,7 @@ include
                 
                 if (this.__nodes != null) {
                     
-                    compos.$dialog.appendMask(this.__nodes, this.__model);
+                    compos.$dialog.appendMask(this.__nodes, (data && data.model) || this.__model);
                     this.__nodes = null;
                     this.__model = null;
                     
@@ -57,6 +57,8 @@ include
                         .ani_show
                         .start(null, compos.$dialog.get(0));   
                 }
+                
+                return this;
             },
             
             hide: function(){

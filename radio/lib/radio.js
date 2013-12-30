@@ -1,5 +1,5 @@
 (function(){
-		
+	
 	function route_current(route, path) {
 		var query = path.indexOf('?');
 		if (query !== -1) 
@@ -47,9 +47,12 @@
 		},
 		
 		onRenderEnd: function(){
+			
 			this
 				.findItems()
 				.on('click', function(event) {
+					
+					
 					
 					var $this = $(event.currentTarget);
 					if ($this.hasClass('active'))
@@ -65,7 +68,6 @@
 						
 					var $parent = $this
 						.parent();
-						
 					
 					// obsolete, to support generic HTML 'change' event
 					$parent.trigger('changed', event.currentTarget);
