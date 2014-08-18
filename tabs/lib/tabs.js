@@ -4,118 +4,125 @@ include
 
 (function(){
 	
-	function child_resolve(child) {
-		if (child.type === mask.Dom.NODE) 
-			return child;
-		
-		
-		if (child.controller && child.controller.prototype.tagName){
-			return child;
+	var getChildren;
+	(function(){
+		getChildren = function($nodes){
+			var $coll = jmask(),
+				imax = $nodes.length,
+				i = -1;
+			while(++i < imax){
+				$coll.add(child_resolve($nodes[i]));
+			}
+			return $coll;
 		}
-		
-		var $col = jmask(),
-			$children = jmask(child).children(),
-			imax = $children.length,
-			i = 0;
+		function child_resolve(child) {
+			if (child.type === mask.Dom.NODE)
+				// is future dom node
+				return child;
 			
-		for (; i < imax; i++) {
-			$col.add(child_resolve($children[i]));
+			var ctr = child.controller;
+			if (ctr && ctr.prototype.tagName)
+				// is future compo with tagName
+				return child;
+			
+			// is compo: get all dom-nodes
+			var $col = jmask(),
+				$children = jmask(child).children(),
+				imax = $children.length,
+				i = 0;
+			for (; i < imax; i++) {
+				$col.add(child_resolve($children[i]));
+			}
+			
+			return $col;
 		}
-		
-		return $col;
-	}
+	}());
 	
-	function route_current(route, path) {
-		var query = path.indexOf('?');
-		if (query !== -1) 
-			path = path.substring(0, query);
-		
-		var _parts = route.split('/'),
-			_length = _parts.length,
-			_default = _parts[_length - 1],
+	var getItems;
+	(function(){
+		getItems = function($tabs, type){
+			var klass = '.-tab-' + type;
+			if ($tabs.$ == null){
+				return getChildren(
+					jmask($tabs).children(klass).children()
+				);
+			}
+			if ($tabs.attr.anchors) {
+				return $($tabs.$.find('.-tab-panels')[0])
+					.find('a[name]');
+			}
+			return $($tabs.$.find('.-tab-' + type + 's')[0])
+				.children(klass);
+		};
+	}())
+	
+	var route_getPath,
+		route_getCurrent;
+	(function(){
+		route_getPath = function(ctx){
+			var path = ctx && ctx.req && ctx.req.url;
+			if (path != null) 
+				return path;
 			
-			_path = path.split('/');
-			
-		
-		if (_length > _path.length) {
-			return _default !== '-'
-				? _default
+			path = typeof ruta !== 'undefined'
+				? ruta.currentPath()
 				: null;
-		}
-		
-		var i = _length - 1;
-		while (--i > -1) {
-			if (_parts[i] === '-')
-				break;
+			if (path != null) 
+				return path;
 			
-			// in case we care about parents path
-			// '/-/strict/tabName'
-			if (_parts[i] !== _path[i]) 
-				return null;
-		}
-		
-		return _path[_length - 1];
-	}
-
+			return typeof location !== 'undefined'
+				? location.pathname
+				: null;
+		};
+		route_getCurrent = function(route, ctx){
+			var path = route_getPath(ctx),
+				query = path.indexOf('?');
+			if (query !== -1) 
+				path = path.substring(0, query);
+			
+			var _parts = route.split('/'),
+				_length = _parts.length,
+				_default = _parts[_length - 1],
+				
+				_path = path.split('/');
+				
+			
+			if (_length > _path.length) {
+				return _default !== '-'
+					? _default
+					: null;
+			}
+			
+			var i = _length - 1;
+			while (--i > -1) {
+				if (_parts[i] === '-')
+					break;
+				
+				// in case we care about parents path
+				// '/-/strict/tabName'
+				if (_parts[i] !== _path[i]) 
+					return null;
+			}
+			return _path[_length - 1];
+		};
+	}());
+	
 	mask.registerHandler(':tabs', mask.Compo({
 		tagName: 'div',
 		attr: {
 			'class': '-tabs'
 		},
-		_children: function($children){
-			var $coll = jmask();
-			
-			if ($children.length === 0)
-				return $coll;
-			
-			for (var i = 0, x, imax = $children.length; i < imax; i++){
-				$coll.add(child_resolve($children[i]));
-			}
-			
-			return $coll;
-		},
-		_items: function(type){
-			var klass = '.-tab-' + type;
-			
-			if (this.$ == null){
-				var $children = jmask(this)
-					.children(klass)
-					.children();
-				
-				return this._children($children);
-			}
-			
-			if (this.attr.anchors) {
-				return this
-					.$
-					.find('.-tab-panels:eq(0)')
-					.find('a[name]');
-			}
-			
-			
-			return this
-				.$
-				.find('.-tab-' + type + 's:eq(0)')
-				.children(klass);
-		},
-		_getHeaders: function(){
-			
-		},
-		
 		slots: {
 			domInsert: function(){
-				
 				if (!this.attr.scrollbar) 
 					return;
-				
 				if (!this.attr.visible) 
 					return;
-				
 				this.setActive(this.attr.visible);
 			}
 		},
 		
-		renderStart: function(model, cntx){
+		renderStart: function(model, ctx){
 			
 			if (this.attr.anchors) 
 				this.attr.scrollbar = true;
@@ -123,16 +130,11 @@ include
 			if (this.attr.scrollbar) 
 				this.attr['class'] += ' scrollbar';
 			
-			if (this.attr['x-route']) {
-				var path = cntx.req && cntx.req.url;
-				if (path == null && typeof location !== 'undefined') 
-					path = location.pathname;
-			
-				this.visible = route_current(this.attr['x-route'], path);
+			var xRoute = this.attr['x-route'];
+			if (xRoute) {
+				this.visible = route_getCurrent(xRoute, ctx);
 				this.attr['x-route'] = null;
-				
 				this.attr.visible = this.visible;
-				
 			}
 	
 			var $this = jmask(this),
@@ -145,7 +147,7 @@ include
 	
 			if (this.attr.anchors == null) {
 		
-				var x = this._children($panels.children());
+				var x = getChildren($panels.children());
 				
 				if (x.length === 0) {
 					console.error('[:tabs] > has no els in @panels tag');
@@ -155,30 +157,23 @@ include
 				x.addClass('-tab-panel -hidden');
 			}
 			
-			this
-				._children($header.children())
+			getChildren($header.children())
 				.addClass('-tab-header -hidden');
 		},
 		
-		onRenderEndServer: function(elements, model, cntx){
-			
+		onRenderEndServer: function(elements, model, ctx) {
 			if (this.visible && !this.attr.scrollbar) {
-				
 				var sel = '[name="'
 					+ this.visible
 					+ '"].-tab-panel';
 					
 				var pane = elements[0].querySelector(sel);
-				if (pane) 
-					pane.classList.add('-show');
-					
-				
-				
 				if (!pane) {
-					debugger;
+					console.error('Tabs: uknown panel', sel);
+					return;
 				}
+				pane.classList.add('-show');
 			}
-			
 		},
 	
 		onRenderEnd: function(){
@@ -186,8 +181,6 @@ include
 				this.scroller = this.closest(':scroller');
 				this.scroller.on('scroll', '', this._scrolled.bind(this));
 			}
-			
-			
 			
 			var $headers = this.$.find('.-tab-header');
 			if ($headers.length === 0)
@@ -199,16 +192,11 @@ include
 				var $this = $(event.currentTarget);
 				if ($this.hasClass('active'))
 					return;
-				
-	
+			
 				var name = $this.attr('name');
-	
 				that.setActive(name);
 				that.$.trigger('change', event.currentTarget);
 			});
-			
-			
-			
 		},
 		
 		animate: function(type, panel, callback){
@@ -263,7 +251,7 @@ include
 		_scrolled: function(top, left){
 			var scrollTop = this.scroller.$[0].scrollTop + (this.attr.dtop << 0);
 			
-			var $panels = this._items('panel'),
+			var $panels = getItems(this, 'panel'),
 				min = null,
 				$el = null;
 				
@@ -300,15 +288,14 @@ include
 		_activeName: null,
 	
 		setActive: function(name){
-			
 			if (this._activeName === name) 
 				return;
 			
 			this._activeName = name;
 	
-			var $panels = this._items('panel'),
-				$headers = this._items('header');
-	
+			var $panels = getItems(this, 'panel'),
+				$headers = getItems(this, 'header');
+				
 			var $panel = $panels
 				.filter('[name="' + name + '"]');
 				
@@ -336,8 +323,7 @@ include
 				.addClass('active');
 		},
 		has: function(name){
-			return this
-				._items('panel')
+			return getItems(this, 'panel')
 				.filter('[name="'+name+'"]')
 				.length !== 0;
 		},
@@ -347,7 +333,7 @@ include
 		
 		getList: function(){
 			var array = [],
-				$panels = this._items('panel'),
+				$panels = getItems(this, 'panel'),
 				name;
 			
 			for (var i = 0, $x, imax = $panels.length; i < imax; i++){
@@ -361,13 +347,8 @@ include
 				if (!name) 
 					name = $x.attr && $x.attr.name;
 				
-				if (!name)
-					debugger;
-				
 				array.push(name);
 			}
-				
-				
 			return array;
 		}
 	}));

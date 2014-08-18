@@ -1,14 +1,14 @@
 {
-  "name": "atma-switchery",
+  "name": "-",
   "version": "0.0.0",
   "description": "Switchery Atma Wrapper",
   "main": "switchery.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "atma test"
   },
   "author": "Alexander Kit <alex.kit@atmajs.com>",
-  "license": "BSD-2-Clause",
+  "license": "MIT",
   "dependencies": {
-    "switchery": "git+https://github.com/abpetkov/switchery.git#0f85db6d1fa18e8b9aa5f28339920014875b2b12"
+    "switchery": "git+https://github.com/abpetkov/switchery.git#f1f018f208290849e888ecdece48b86a4473e484"
   }
 }
